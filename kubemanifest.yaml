@@ -1,0 +1,71 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      io.kompose.service: app
+    name: app
+  spec:
+    ports:
+    - name: "80"
+      port: 80
+      targetPort: 8080
+    selector:
+      io.kompose.service: app
+      
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      io.kompose.service: app
+    name: app
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        io.kompose.service: app
+    template:
+      metadata:
+        labels:
+          io.kompose.service: app
+      spec:
+        containers:
+        - env:
+          - name: DATABASE_PREFIX
+          - name: ERAMBA_HOSTNAME
+            value: app
+          - name: MYSQL_DATABASE
+            value: erambadb
+          - name: MYSQL_HOSTNAME
+            value: localhost
+          - name: MYSQL_PASSWORD
+            value: root
+          - name: MYSQL_USER
+            value: eramba
+          image: markz0r/eramba-app:c281
+          imagePullPolicy: ""
+          name: eramba-community-docker-app-1
+          ports:
+          - containerPort: 8080
+          resources: {}
+        - env:
+          - name: MYSQL_DATABASE
+            value: erambadb
+          - name: MYSQL_PASSWORD
+            value: root
+          - name: MYSQL_ROOT_PASSWORD
+            value: root
+          - name: MYSQL_USER
+            value: eramba
+          image: markz0r/eramba-db
+          imagePullPolicy: ""
+          name: eramba-community-docker-db-1
+          resources: {}
+        restartPolicy: Always
+        serviceAccountName: ""
+        volumes: null
+  status: {}
+kind: List
+metadata: {}
+

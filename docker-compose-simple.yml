@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+  db:
+    image: markz0r/eramba-db
+    container_name: eramba-community-docker_db_1
+    restart: always
+
+    environment: 
+        MYSQL_DATABASE: erambadb
+        MYSQL_USER: eramba
+        MYSQL_PASSWORD: root 
+        MYSQL_ROOT_PASSWORD: root
+    # If you are running on Windows or Mac the shared volume will cause
+    # an InnoDB error, uncomment the following lines:
+    #
+    #command:
+    #  'mysqld --innodb-flush-method=fsync'
+  app:
+    # image: digitorus/eramba:enterprise
+    image: markz0r/eramba-app:c281
+    container_name: eramba-community-docker_app_1
+    depends_on:
+      - db
+    restart: always
+    environment:
+      ERAMBA_HOSTNAME: app
+      MYSQL_HOSTNAME: db
+      MYSQL_USER: eramba
+      MYSQL_DATABASE: erambadb
+      MYSQL_PASSWORD: root
+      DATABASE_PREFIX: ""
+    # map the domain to localhost for wkhtmltopdf
+    ports:
+     - "80:8080"
+    links:
+     - db
+    # You can create a full database backup with:
+      # docker exec db-container sh -c \
+      # 'exec mysqldump --all-databases -uroot -p"$MYSQL_ROOT_PASSWORD"' > ~/backup/all-databases.sql;
+
